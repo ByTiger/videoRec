@@ -1,0 +1,360 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>post test</title>
+</head>
+<!--[if lt IE 9]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<script src="jquery.js"></script>
+<script src="jquery.cookie.js"></script>
+
+<style type="text/css">
+  .button {
+    background-color: #eee;
+    color: #000;
+    -webkit-border-radius: 3px 3px;
+       -moz-border-radius: 3px 3px;
+         -o-border-radius: 3px 3px;
+            border-radius: 3px 3px;
+    border-color: #808080;
+    border-width: 1px;
+    border-style: solid;
+    display: inline-block;
+    overflow: hidden;;
+    text-align: center;
+    vertical-align: middle;
+    font-family: Tahoma;
+    font-size: 11px;
+    color: #202020;
+    text-decoration: none;
+    padding: 3px 10px;
+
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+        -ms-box-sizing: border-box;
+            box-sizing: border-box;
+
+    background-image: -webkit-linear-gradient( rgb(210,210,210), rgb(250,250,250) );
+    background-image:    -moz-linear-gradient( rgb(210,210,210), rgb(250,250,250) );
+    background-image:      -o-linear-gradient( top, rgb(210,210,210), rgb(250,250,250) );
+    background-image:         linear-gradient( rgb(210,210,210), rgb(250,250,250) );
+  }
+  
+  .button:hover{
+    background-image: -webkit-linear-gradient( rgb(250,250,250), rgb(210,210,210) );
+    background-image:    -moz-linear-gradient( rgb(250,250,250), rgb(210,210,210) );
+    background-image:      -o-linear-gradient( top, rgb(250,250,250), rgb(210,210,210) );
+    background-image:         linear-gradient( rgb(250,250,250), rgb(210,210,210) );
+  }
+  
+  .progress {
+    background-color: #fff;
+    color: #000;
+    -webkit-border-radius: 3px 3px;
+       -moz-border-radius: 3px 3px;
+         -o-border-radius: 3px 3px;
+            border-radius: 3px 3px;
+    border-color: #808080;
+    border-width: 1px;
+    border-style: solid;
+    overflow: hidden;
+  }
+
+  .progress_fill {
+    background-color: #00a000;
+  }
+
+  div.recobj {
+    position:fixed;
+    display:block;
+    width:100%;
+    height:0px;
+    background-color: rgba(0,0,0,0.5);
+    top:-100px;
+    left:0px;
+    overflow: hidden;
+  }
+
+  div.recobj > div {
+    position:relative;
+    display:block;
+    width:100%;
+    height: 100%;
+  }
+  
+  div.recobj > div >  div {
+    position:absolute;
+    display:inline-block;
+    left:50%;
+    top:50%;
+    margin-left:-108px;
+    margin-top:-69px;
+  }
+
+  #report {
+    width:100%;
+    height: 400px;
+    display:block;
+    overflow: scroll;
+  }
+  
+  #report > div {
+    font-family: arial;
+    font-size: 14px;
+    color: #202020;
+  }
+  
+  #report > div > span {
+    color: #006000;
+  }
+</style>
+
+<script>
+
+  function GetSWF(strName)
+  {
+    if (window.document[strName] != null)
+    {
+      if (window.document[strName].length == null)
+        return window.document[strName];
+      else
+        return window.document[strName][1];
+    }
+    else
+    {
+      if (document[strName].length == null)
+        return document[strName];
+      else
+        return document[strName][1];
+    }
+  }
+
+
+
+  // send simple post or get query to server
+  function simple_request(cmd)
+  {
+//    StartRecord
+//    StopRecord
+//    DeleteRecorded
+//    Encode
+//    PlayRecord
+//    StopPlaingRecord
+//    Post
+    
+    if(cmd == "start rec")
+    {
+      GetSWF("videoRec").StartRecord();
+    }
+    if(cmd == "stop rec")
+    {
+      GetSWF("videoRec").StopRecord();
+    }
+    if(cmd == "delete rec")
+    {
+      GetSWF("videoRec").DeleteRecorded();
+    }
+    if(cmd == "start play")
+    {
+      GetSWF("videoRec").PlayRecord();
+    }
+    if(cmd == "stop play")
+    {
+      GetSWF("videoRec").StopPlaingRecord();
+    }
+    if(cmd == "encode")
+    {
+      GetSWF("videoRec").Encode();
+    }
+    if(cmd == "post")
+    {
+      var url = jQuery("#url").val();
+      var token = jQuery("#token").val();
+      if(url.length <=0 || token.length <= 0) return;
+      console.log("post to:",url, ", token:",token);
+      GetSWF("soundRec").Post(url, token);
+    }
+    if(cmd == "auto on")
+    {
+      GetSWF("videoRec").AutoEncode("true");
+    }
+    if(cmd == "auto off")
+    {
+      GetSWF("videoRec").AutoEncode("true");
+    }
+    if(cmd == "Save")
+    {
+      GetSWF("videoRec").Save();
+    }
+  }
+
+
+  window.vr_onRecordStart = function()
+  {
+    jQuery("#report").append(jQuery("<div>").html("<b>vr_onRecordStart</b>"));
+    jQuery("#report").attr({ scrollTop: jQuery("#report").attr("scrollHeight") });
+
+    console.log("vr_onRecordStart");
+  };
+  window.vr_onRecordTime = function(time)
+  {
+    jQuery("#report").append(jQuery("<div>").html("<b>vr_onRecordTime</b> time = " + time));
+    jQuery("#report").attr({ scrollTop: jQuery("#report").attr("scrollHeight") });
+    jQuery("#soundInfo").text(time);
+
+    console.log("vr_onRecordTime time = " + time);
+  };
+  window.vr_onRecordStop = function()
+  {
+    jQuery("#report").append(jQuery("<div>").html("<b>vr_onRecordStop</b>"));
+    jQuery("#report").attr({ scrollTop: jQuery("#report").attr("scrollHeight") });
+
+    console.log("vr_onRecordStop");
+  };
+  window.vr_onRecordDeleted = function()
+  {
+    jQuery("#report").append(jQuery("<div>").html("<b>vr_onRecordDeleted</b>"));
+    jQuery("#report").attr({ scrollTop: jQuery("#report").attr("scrollHeight") });
+
+    console.log("vr_onRecordDeleted");
+  };
+  window.vr_onEncodeStart = function()
+  {
+    jQuery("#report").append(jQuery("<div>").html("<b>vr_onEncodeStart</b>"));
+    jQuery("#report").attr({ scrollTop: jQuery("#report").attr("scrollHeight") });
+
+    console.log("vr_onEncodeStart");
+  };
+  window.vr_onEncodeProgress = function(cur, total)
+  {
+    jQuery("#report").append(jQuery("<div>").html("<b>vr_onEncodeProgress</b> - " + cur + "/" + total));
+    jQuery("#report").attr({ scrollTop: jQuery("#report").attr("scrollHeight") });
+
+    console.log("vr_onEncodeProgress - " + cur + "/" + total);
+    jQuery("#zxc").width(300 * cur / total);
+  };
+  
+  window.vr_onEncodeStop = function()
+  {
+    jQuery("#report").append(jQuery("<div>").html("<b>vr_onEncodeStop</b>"));
+    jQuery("#report").attr({ scrollTop: jQuery("#report").attr("scrollHeight") });
+
+    console.log("vr_onEncodeStop");
+  };
+  window.vr_onPlayStart = function()
+  {
+    jQuery("#report").append(jQuery("<div>").html("<b>vr_onPlayStart</b>"));
+    jQuery("#report").attr({ scrollTop: jQuery("#report").attr("scrollHeight") });
+
+    console.log("vr_onPlayStart");
+  };
+  window.vr_onPlayProgress = function(cur, total)
+  {
+    jQuery("#report").append(jQuery("<div>").html("<b>vr_onPlayProgress</b>" + cur + "/" + total));
+    jQuery("#report").attr({ scrollTop: jQuery("#report").attr("scrollHeight") });
+
+    console.log("vr_onPlayProgress" + cur + "/" + total);
+    jQuery("#zxc").width(300 * cur / total);
+  };
+  window.vr_onPlayStop = function()
+  {
+    jQuery("#report").append(jQuery("<div>").html("<b>vr_onPlayStop</b>"));
+    jQuery("#report").attr({ scrollTop: jQuery("#report").attr("scrollHeight") });
+
+    console.log("vr_onPlayStop");
+  };
+  window.vr_onAutoEncode = function(is)
+  {
+    jQuery("#report").append(jQuery("<div>").html("<b>vr_onAutoEncode</b>" + is));
+    jQuery("#report").attr({ scrollTop: jQuery("#report").attr("scrollHeight") });
+
+    console.log("vr_onAutoEncode" + is);
+  };
+  window.vr_onPostStart = function()
+  {
+    jQuery("#report").append(jQuery("<div>").html("<b>vr_onPostStart</b>"));
+    jQuery("#report").attr({ scrollTop: jQuery("#report").attr("scrollHeight") });
+
+    console.log("vr_onPostStart");
+  };
+  window.vr_onPostComplete = function()
+  {
+    jQuery("#report").append(jQuery("<div>").html("<b>vr_onPostComplete</b>"));
+    jQuery("#report").attr({ scrollTop: jQuery("#report").attr("scrollHeight") });
+
+    console.log("vr_onPostComplete");
+  };
+  window.vr_onPostError = function(code)
+  {
+    jQuery("#report").append(jQuery("<div>").html("<b>vr_onPostError</b>" + code));
+    jQuery("#report").attr({ scrollTop: jQuery("#report").attr("scrollHeight") });
+
+    console.log("vr_onPostError" + is);
+  };
+
+
+
+
+  window.onload = function()
+  {
+    GetSWF("videoRec").SetPostData(
+            "http://uploads.gdata.youtube.com/feeds/api/users/default/uploads",
+            "1/4mMGyYSKRiPCqVpxQffTq1B3x0wZFMClKvfiG_6AjpQ",
+            "AI39si5yWp5hM7n3r-pWAGLMLm-spwP_EMzB3DzBjoD21-yz8TX69xWpqU-EMSFaNbqkHqHXn1O4VXmgt4FswRYrRPocX0OX0g",
+            "bytiger.com");
+    GetSWF("videoRec").SetMediaData("123","234","People","345");
+  };
+
+  jQuery(window).resize(function()
+  {
+    var obj = jQuery(".recobj");
+    if(obj.length <= 0) return;
+    if(parseInt(obj.css("top"))<0) return;
+
+    obj.width(jQuery(window).width());
+    obj.height(jQuery(window).height());
+  });
+</script>
+<body>
+  <embed type="application/x-shockwave-flash" src="videoRec.swf" id="videoRec" name="videoRec" width="320" height="240" flashvars="" allowscriptaccess="always" allowfullscreen="true" bgcolor="#ffffff">
+
+  <div style="display: table; width: 100%">
+    <div style="display: table-cell; width: 40%">
+
+      <div>Token : <input type="text" id="token" value="AIwbFATKg86hKOwESuyFRf9S6ut3hUKvl1o7MrnkuQWY1GA2oUabjgcBgxhORehIFgYcJMXPVnbM5OFj9GSdueMgjI5elZo3yse12AFh4m4zSLmho1PrY9BiQp-XBtFX4ILz2sHW6yvHr6ka5Pytbjl1ApdhMIQYUTB3TMvedWWvvTgH64crjf0f8Y82Ma_wGZ0Yf5lfebFu-URVt1hTtsehpr9sz_oGPj2k0Wdgs6HxMysNO7p-7Rm2vWNCKG7T6bm6z_qR-WPB" style="width:70%"/></div>
+
+      <div>
+        <a href="#" class="button" onclick="simple_request('start rec')"/>Start rec</a>
+        <a href="#" class="button" onclick="simple_request('stop rec')"/>Stop rec</a>
+        <a href="#" class="button" onclick="simple_request('delete rec')"/>Delete</a>
+      </div>
+      <div>
+        <a href="#" class="button" onclick="simple_request('start play')"/>Start play</a>
+        <a href="#" class="button" onclick="simple_request('stop play')"/>Stop play</a>
+        <a href="#" class="button" onclick="simple_request('save')"/>Save</a>
+      </div>
+      <div>
+        <a href="#" class="button" onclick="simple_request('auto on')"/>Auto on</a>
+        <a href="#" class="button" onclick="simple_request('auto off')"/>Auto off</a>
+        <a href="#" class="button" onclick="simple_request('encode')"/>Encode</a>
+        <a href="#" class="button" onclick="simple_request('post')"/>Post</a>
+      </div>
+
+      <div>
+        Progress line:
+        <div style="display:inline-block;width:300px;height:20px" class="progress">
+          <div id="zxc" style="display:inline-block;height:20px" class="progress_fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: table-cell; width: 60%">
+      <div id="report">
+        <div><b>Report (see copy of log in your browser console):</b></div>
+     </div>
+    </div>
+  </div>
+</body>
+</html>
